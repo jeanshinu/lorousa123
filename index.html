@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Python for Fun Peeps 🐍 Full Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0f0e17;--card:#1a1a2e;--card2:#16213e;
+  --w1:#ffd166;--w2:#118ab2;--w3:#ef476f;--w4:#06d6a0;--w5:#2dd4bf;
+  --w6:#a855f7;--w7:#c084fc;--w8:#e879f9;
+  --w9:#f77f00;--w10:#fb923c;--w11:#ec4899;--w12:#38bdf8;
+  --white:#fffcf2;--muted:#a8a4b8;--border:rgba(255,255,255,0.08);
+  --accent:var(--w1);
+  --tbg:#1a1208;--tborder:rgba(255,209,102,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 15% 50%,rgba(168,85,247,0.04) 0%,transparent 50%),radial-gradient(circle at 85% 20%,rgba(6,214,160,0.04) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* ═══════════════════════════════
+   SIDEBAR
+═══════════════════════════════ */
+.shell{display:flex;min-height:100vh;position:relative;z-index:1;}
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--card2);
+  border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+
+/* ── SIDEBAR HEADER (logo + toggle) ── */
+.sidebar-header{
+  padding:18px 16px 14px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.sidebar-title{
+  font-family:'Fredoka One',cursive;
+  font-size:17px;
+  line-height:1.2;
+  margin-bottom:12px;
+}
+.sidebar-title span{
+  display:block;font-size:10px;
+  font-family:'Nunito',sans-serif;
+  color:var(--muted);font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;
+  margin-top:3px;
+}
+
+/* ── MODE TOGGLE (in sidebar) ── */
+.mode-toggle{
+  display:flex;
+  background:rgba(0,0,0,0.3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  width:100%;
+}
+.mode-btn{
+  flex:1;padding:8px 6px;
+  font-family:'Fredoka One',cursive;font-size:13px;
+  cursor:pointer;border:none;background:transparent;
+  color:var(--muted);transition:all 0.22s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.mode-btn:first-child{border-right:1px solid var(--border);}
+.mode-btn.active.student-active{background:var(--w4);color:#0f0e17;}
+.mode-btn.active.teacher-active{background:var(--w1);color:#1a1a2e;}
+
+/* ── WEEK NAV ── */
+.sidebar-nav{flex:1;overflow-y:auto;padding-bottom:24px;}
+.week-group-label{
+  font-size:10px;font-weight:800;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--muted);
+  padding:14px 18px 4px;opacity:0.55;
+}
+.week-nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 16px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;
+  color:var(--muted);transition:all 0.2s;
+  border-left:3px solid transparent;user-select:none;
+  position:relative;
+}
+.week-nav-item:hover:not(.locked-nav){color:var(--white);background:rgba(255,255,255,0.04);}
+.week-nav-item.active{color:var(--white);border-left-color:var(--accent);}
+.week-nav-item.locked-nav{opacity:0.38;cursor:not-allowed;}
+.week-dot{
+  width:24px;height:24px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:11px;
+  flex-shrink:0;color:#0f0e17;
+}
+.nav-lock{margin-left:auto;font-size:13px;opacity:0.6;}
+
+/* teacher unlock toggle per week in nav */
+.unlock-btn{
+  margin-left:auto;
+  font-size:11px;padding:2px 7px;
+  border-radius:5px;border:1px solid;
+  cursor:pointer;font-family:'Fredoka One',cursive;
+  transition:all 0.2s;flex-shrink:0;
+}
+.unlock-btn.locked-btn{border-color:var(--w3);color:var(--w3);background:rgba(239,71,111,0.1);}
+.unlock-btn.locked-btn:hover{background:rgba(239,71,111,0.2);}
+.unlock-btn.open-btn{border-color:var(--w4);color:var(--w4);background:rgba(6,214,160,0.1);}
+.unlock-btn.open-btn:hover{background:rgba(6,214,160,0.2);}
+
+/* progress dots */
+.week-progress{display:flex;gap:3px;padding:10px 16px 12px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:2px;}
+.wp-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.1);transition:all 0.3s;cursor:pointer;flex-shrink:0;}
+.wp-dot.unlocked{background:rgba(255,255,255,0.25);}
+.wp-dot.current{transform:scale(1.3);}
+
+/* ═══════════════════════════════
+   MAIN
+═══════════════════════════════ */
+.main{flex:1;padding:0 0 80px;min-width:0;}
+.week-section{display:none;padding:30px 30px 60px;}
+.week-section.active{display:block;}
+
+/* ── LOCKED SCREEN ── */
+.locked-screen{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-height:60vh;text-align:center;
+  padding:40px 20px;
+}
+.locked-screen .lock-icon{font-size:80px;margin-bottom:20px;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+.locked-screen h2{font-family:'Fredoka One',cursive;font-size:32px;color:var(--muted);margin-bottom:10px;}
+.locked-screen p{font-size:15px;color:var(--muted);max-width:380px;line-height:1.7;}
+
+/* teacher-only visibility */
+.teacher-only{transition:all 0.2s;}
+body.student-mode .teacher-only{display:none!important;}
+body:not(.student-mode) .teacher-only{border-left:3px solid var(--w1)!important;}
+
+/* ═══════════════════════════════
+   PASSWORD MODAL
+═══════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.85);
+  z-index:500;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);
+}
+.modal-overlay.open{display:flex;}
+.modal-box{
+  background:var(--card2);
+  border:2px solid var(--tborder);
+  border-radius:24px;padding:36px;
+  width:100%;max-width:380px;
+  text-align:center;
+  animation:modalIn 0.3s ease;
+}
+@keyframes modalIn{from{transform:scale(0.85) translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
+.modal-box .modal-icon{font-size:52px;margin-bottom:14px;}
+.modal-box h2{font-family:'Fredoka One',cursive;font-size:24px;color:var(--w1);margin-bottom:6px;}
+.modal-box p{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.pw-input{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:2px solid rgba(255,255,255,0.12);
+  border-radius:12px;padding:12px 16px;
+  color:var(--white);font-family:'Space Mono',monospace;
+  font-size:16px;outline:none;text-align:center;
+  letter-spacing:0.2em;transition:border-color 0.2s;
+  margin-bottom:14px;
+}
+.pw-input:focus{border-color:var(--w1);}
+.pw-input.pw-wrong{border-color:var(--w3);animation:shake 0.4s ease;}
+.modal-btns{display:flex;gap:10px;}
+.modal-btn{
+  flex:1;padding:12px;border:none;border-radius:11px;
+  font-family:'Fredoka One',cursive;font-size:15px;
+  cursor:pointer;transition:all 0.2s;
+}
+.modal-btn.confirm{background:var(--w1);color:#1a1a2e;}
+.modal-btn.confirm:hover{filter:brightness(1.1);}
+.modal-btn.cancel{background:rgba(255,255,255,0.07);color:var(--muted);border:1px solid var(--border);}
+.modal-btn.cancel:hover{color:var(--white);}
+.pw-error{font-size:13px;color:var(--w3);margin-bottom:10px;min-height:18px;font-weight:700;}
+
+/* ═══════════════════════════════
+   MOBILE
+═══════════════════════════════ */
+.mob-drawer{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;flex-direction:column;padding:16px;}
+.mob-drawer.open{display:flex;}
+.mob-drawer-inner{background:var(--card2);border-radius:18px;padding:16px;max-width:320px;width:100%;margin:auto;max-height:82vh;overflow-y:auto;}
+.mob-close{width:100%;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:9px;color:var(--white);font-family:'Fredoka One',cursive;font-size:14px;padding:11px;cursor:pointer;margin-top:10px;}
+
+/* ═══════════════════════════════
+   HERO
+═══════════════════════════════ */
+.hero{border-radius:22px;padding:36px;margin-bottom:22px;position:relative;overflow:hidden;}
+.hero::after{content:attr(data-emoji);position:absolute;right:26px;top:50%;transform:translateY(-50%);font-size:86px;opacity:0.08;line-height:1;pointer-events:none;}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.2);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:13px;}
+.hero h1{font-family:'Fredoka One',cursive;font-size:clamp(30px,4.5vw,52px);line-height:1.05;margin-bottom:10px;}
+.hero p{font-size:14px;color:rgba(255,255,255,0.7);max-width:560px;line-height:1.7;}
+.part-tag{display:inline-block;font-family:'Fredoka One',cursive;font-size:12px;padding:3px 12px;border-radius:999px;margin-bottom:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);}
+
+/* ═══════════════════════════════
+   CONTENT COMPONENTS
+═══════════════════════════════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:14px;}
+.card h2{font-family:'Fredoka One',cursive;font-size:19px;margin-bottom:10px;}
+.card h3{font-family:'Fredoka One',cursive;font-size:16px;margin-bottom:8px;}
+.card p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+.card ul,.card ol{padding-left:18px;}
+.card li{color:var(--muted);font-size:14px;margin-bottom:6px;line-height:1.5;}
+
+.teacher-card{background:var(--tbg);border:1px solid var(--tborder);border-radius:18px;padding:20px;margin-bottom:14px;}
+.teacher-card h2{font-family:'Fredoka One',cursive;font-size:17px;color:var(--w1);margin-bottom:10px;}
+.teacher-card p,.teacher-card li{font-size:14px;color:#d4b896;line-height:1.7;}
+.teacher-card ul{padding-left:18px;}
+.teacher-card li{margin-bottom:6px;}
+
+.stitle{font-family:'Fredoka One',cursive;font-size:clamp(19px,3.2vw,26px);margin:26px 0 12px;display:flex;align-items:center;gap:10px;}
+.stitle .snum{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#0f0e17;background:var(--accent);}
+
+.code-block{background:#090912;border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:15px 17px;font-family:'Space Mono',monospace;font-size:13px;line-height:1.9;overflow-x:auto;margin:10px 0;}
+.code-block .ln{display:block;}
+.cv{color:#ffd166;}.cf{color:#06d6a0;}.cs{color:#ef476f;}.cn{color:#a855f7;}.co{color:#f77f00;}.cc{color:#3d3d5c;}
+
+.gg{background:var(--card2);border:2px solid rgba(255,209,102,0.18);border-radius:15px;padding:17px;margin:12px 0;}
+.gg .qlabel{font-family:'Fredoka One',cursive;font-size:14px;color:var(--w1);margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.gg-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.gg input{flex:1;min-width:90px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:9px;padding:8px 12px;color:var(--white);font-family:'Space Mono',monospace;font-size:13px;outline:none;transition:border-color 0.2s;}
+.gg input:focus{border-color:var(--w1);}
+.gg input.ok{border-color:#06d6a0;background:rgba(6,214,160,0.08);}
+.gg input.no{border-color:#ef476f;background:rgba(239,71,111,0.08);}
+.gg .fb{margin-top:8px;font-size:13px;font-weight:700;min-height:18px;}
+.gg .fb.ok{color:#06d6a0;}.gg .fb.no{color:#ef476f;}
+.btn{background:var(--w1);color:#1a1a2e;border:none;border-radius:9px;padding:8px 16px;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+.btn:hover{transform:scale(1.04);filter:brightness(1.1);}
+.btn:active{transform:scale(0.97);}
+
+.tip{display:flex;gap:10px;padding:12px 14px;border-radius:11px;margin:10px 0;font-size:13px;line-height:1.6;background:rgba(6,214,160,0.08);border:1px solid rgba(6,214,160,0.22);color:#a7f3d0;}
+.warn{display:flex;gap:10px;padding:12px 14px;border-radius:11px;margin:10px 0;font-size:13px;line-height:1.6;background:rgba(239,71,111,0.08);border:1px solid rgba(239,71,111,0.22);color:#fda4af;}
+.info{display:flex;gap:10px;padding:12px 14px;border-radius:11px;margin:10px 0;font-size:13px;line-height:1.6;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.22);color:#d8b4fe;}
+.teacher-tip{display:flex;gap:10px;padding:12px 14px;border-radius:11px;margin:10px 0;font-size:13px;line-height:1.6;background:rgba(255,209,102,0.07);border:1px solid rgba(255,209,102,0.22);color:#d4b896;}
+.tip .ic,.warn .ic,.info .ic,.teacher-tip .ic{font-size:17px;flex-shrink:0;}
+
+.cklist{list-style:none;padding:0;}
+.cklist li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;cursor:pointer;user-select:none;transition:color 0.2s;}
+.cklist li:last-child{border-bottom:none;}
+.cklist .cb{width:22px;height:22px;border:2px solid var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all 0.2s;}
+.cklist li.done .cb{background:var(--w4);border-color:var(--w4);color:#0f0e17;}
+.cklist li.done{color:var(--muted);text-decoration:line-through;}
+
+.op-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0;}
+.op-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:15px 10px;text-align:center;cursor:pointer;transition:all 0.2s;user-select:none;}
+.op-card:hover{transform:scale(1.04);}
+.op-symbol{font-family:'Fredoka One',cursive;font-size:30px;display:block;margin-bottom:5px;}
+.op-card h4{font-family:'Fredoka One',cursive;font-size:13px;margin-bottom:2px;}
+.op-card p{font-size:11px;color:var(--muted);}
+.op-demo{margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;background:rgba(255,255,255,0.06);padding:4px 7px;border-radius:5px;opacity:0;transition:opacity 0.3s;}
+.op-card.revealed .op-demo{opacity:1;}
+
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;}
+.cmp-table th{background:rgba(255,255,255,0.05);padding:9px 10px;text-align:left;font-family:'Fredoka One',cursive;font-size:13px;border-bottom:1px solid var(--border);}
+.cmp-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);}
+.cmp-table td:first-child{font-family:'Space Mono',monospace;color:var(--w4);font-size:12px;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table td.t{color:var(--w4);font-weight:700;}.cmp-table td.f{color:var(--w3);font-weight:700;}
+
+.loop-visual{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;align-items:center;}
+.loop-box{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:15px;background:rgba(168,85,247,0.12);border:2px solid rgba(168,85,247,0.35);color:var(--w6);transition:all 0.4s;}
+.loop-box.active{background:rgba(168,85,247,0.45);border-color:var(--w6);transform:scale(1.15);}
+.loop-box.done{background:rgba(6,214,160,0.12);border-color:var(--w4);color:var(--w4);}
+.loop-arrow{color:var(--muted);font-size:16px;}
+
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0;}
+.type-card{background:var(--card);border:2px solid var(--border);border-radius:13px;padding:15px;text-align:center;transition:all 0.2s;cursor:pointer;}
+.type-card:hover{transform:translateY(-3px);}
+.type-card .te{font-size:26px;display:block;margin-bottom:6px;}
+.type-card h4{font-family:'Fredoka One',cursive;font-size:13px;margin-bottom:3px;}
+.type-card p{font-size:11px;color:var(--muted);}
+.type-card code{font-family:'Space Mono',monospace;font-size:10px;background:rgba(255,255,255,0.08);padding:2px 5px;border-radius:3px;display:inline-block;margin-top:4px;}
+
+.quest{background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--accent);border-radius:20px;padding:24px;margin:16px 0;position:relative;overflow:hidden;}
+.quest::before{content:attr(data-icon);position:absolute;right:16px;top:-8px;font-size:66px;opacity:0.07;}
+.quest h2{font-family:'Fredoka One',cursive;font-size:21px;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.quest p{color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:12px;}
+.req-list{list-style:none;padding:0;display:grid;gap:6px;}
+.req-list li{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-size:13px;display:flex;align-items:flex-start;gap:7px;color:var(--muted);}
+.req-list li::before{content:'→';color:var(--accent);font-weight:bold;flex-shrink:0;margin-top:1px;}
+
+.mistake-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;}
+.mi{background:rgba(239,71,111,0.06);border:1px solid rgba(239,71,111,0.18);border-radius:11px;padding:12px;}
+.mi strong{display:block;font-size:12px;margin-bottom:5px;color:var(--white);}
+.mi .bad{font-family:'Space Mono',monospace;color:#ef476f;font-size:11px;display:block;margin:3px 0 1px;}
+.mi .good{font-family:'Space Mono',monospace;color:#06d6a0;font-size:11px;display:block;}
+
+.obj-preview{background:rgba(56,189,248,0.06);border:2px solid rgba(56,189,248,0.22);border-radius:15px;padding:18px;margin:12px 0;}
+.obj-preview h3{font-family:'Fredoka One',cursive;color:#38bdf8;font-size:16px;margin-bottom:8px;}
+.obj-preview p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:8px;}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
+.step-box{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px 10px;text-align:center;}
+.step-box .sn{font-family:'Fredoka One',cursive;font-size:24px;color:var(--accent);display:block;margin-bottom:4px;}
+.step-box p{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* score + confetti */
+.score-bar{position:fixed;bottom:16px;right:16px;background:var(--card2);border:2px solid var(--w1);border-radius:15px;padding:10px 16px;z-index:200;display:flex;align-items:center;gap:8px;box-shadow:0 8px 30px rgba(0,0,0,0.5);}
+.score-bar .sl{font-size:10px;color:var(--muted);}
+.score-bar .sv{font-family:'Fredoka One',cursive;font-size:20px;color:var(--w1);}
+.conf{position:fixed;pointer-events:none;z-index:999;font-size:24px;animation:cfly 1.2s ease forwards;}
+@keyframes cfly{0%{transform:translateY(0) scale(1);opacity:1;}100%{transform:translateY(-150px) scale(0.4);opacity:0;}}
+
+ic{font-family:'Space Mono',monospace;font-size:12px;background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:4px;display:inline;}
+
+.fi{opacity:0;transform:translateY(16px);transition:opacity 0.5s,transform 0.5s;}
+.fi.vis{opacity:1;transform:none;}
+
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-7px);}75%{transform:translateX(7px);}}
+
+.mobile-bar{display:none;position:sticky;top:0;z-index:50;background:var(--card2);border-bottom:1px solid var(--border);padding:9px 10px;align-items:center;gap:7px;}
+.mobile-bar .cur-week{font-family:'Fredoka One',cursive;font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mob-menu-btn{background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--white);font-size:15px;cursor:pointer;flex-shrink:0;}
+.mob-mode-pill{flex-shrink:0;display:flex;align-items:center;background:rgba(0,0,0,0.35);border:1.5px solid var(--border);border-radius:9px;overflow:hidden;}
+.mob-pill-btn{padding:7px 10px;font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.2s;white-space:nowrap;line-height:1;}
+.mob-pill-btn:first-child{border-right:1px solid var(--border);}
+.mob-pill-btn.active.s{background:var(--w4);color:#0f0e17;}
+.mob-pill-btn.active.t{background:var(--w1);color:#1a1a2e;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:820px){
+  .sidebar{display:none;}
+  .mobile-bar{display:flex;}
+  .week-section{padding:16px 14px 60px;}
+  .g2,.g3,.g4,.op-grid,.type-grid,.steps,.mistake-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:500px){
+  .g2,.g3,.g4,.op-grid,.type-grid,.steps,.mistake-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body class="student-mode">
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pwModal">
+  <div class="modal-box">
+    <div class="modal-icon">🔐</div>
+    <h2>Teacher Mode</h2>
+    <p>Enter the password to unlock teacher mode and manage lessons.</p>
+    <input class="pw-input" id="pwInput" type="password" placeholder="••••••••" maxlength="30"
+      onkeydown="if(event.key==='Enter')submitPw()"/>
+    <div class="pw-error" id="pwError"></div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closePwModal()">Cancel</button>
+      <button class="modal-btn confirm" onclick="submitPw()">🔓 Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCORE BAR (student only) -->
+<div class="score-bar" id="scoreBar"><span>⭐</span><div><div class="sl">Points</div><div class="sv" id="scoreVal">0</div></div></div>
+
+<!-- MOBILE BAR -->
+<div class="mobile-bar" id="mobileBar">
+  <button class="mob-menu-btn" onclick="openDrawer()">☰</button>
+  <span class="cur-week" id="curWeekLabel">Week 1</span>
+  <div class="mob-mode-pill">
+    <button class="mob-pill-btn s active" id="mobBtnStudent" onclick="clickStudentMode()">🎮</button>
+    <button class="mob-pill-btn t" id="mobBtnTeacher" onclick="clickTeacherMode()">👨‍🏫</button>
+  </div>
+</div>
+<div class="mob-drawer" id="mobDrawer">
+  <div class="mob-drawer-inner" id="mobDrawerInner"></div>
+  <button class="mob-close" onclick="closeDrawer()">✕ Close</button>
+</div>
+
+<div class="shell">
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">🐍 Python for Fun Peeps<span>12 Weeks · Full Course</span></div>
+    <div class="mode-toggle">
+      <button class="mode-btn student-active active" id="btnStudent" onclick="clickStudentMode()">🎮 Student</button>
+      <button class="mode-btn teacher-active" id="btnTeacher" onclick="clickTeacherMode()">👨‍🏫 Teacher</button>
+    </div>
+  </div>
+  <div class="week-progress" id="wprogress"></div>
+  <div class="sidebar-nav" id="weekNav"></div>
+</nav>
+
+<!-- ══════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════ -->
+<main class="main" id="mainContent">
+
+<!-- ══════════ WEEK 1 ══════════ -->
+<section class="week-section" id="w1" data-week="1">
+<div class="locked-screen" id="lock1" style="display:none">
+  <div class="lock-icon">🔒</div>
+  <h2>Lesson Locked</h2>
+  <p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p>
+</div>
+<div id="content1">
+<div class="hero fi" style="background:linear-gradient(135deg,#1a1209,#2d1f00);border:1px solid rgba(255,209,102,0.3);" data-emoji="🐍">
+  <div class="hero-badge" style="border-color:var(--w1);color:var(--w1);">Week 1 · Beginner Python</div>
+  <h1 style="background:linear-gradient(135deg,var(--w1),#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Hello, Python! 👋</h1>
+  <p>We start super easy. No complicated stuff yet. Just: what IS Python, how do you run it, and how do you make it say things. That's literally it this week.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w1);">🎯 Week Goals</h2>
+    <ul class="cklist">
+      <li onclick="toggleTask(this)"><span class="cb"></span>Know what Python is</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Run your first line of code</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Use print() to show text</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Write comments with #</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Know what a syntax error looks like</li>
+    </ul>
+  </div>
+  <div class="teacher-card teacher-only fi">
+    <h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Week 1 is 100% about confidence. If he types one line and sees it work — that's the whole win. Don't rush.</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>Use <strong>replit.com</strong> — no install, just open the browser and start typing. Remove all friction this first week.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum">1</span> What Is Python?</div>
+<div class="card fi">
+  <p>Python is a <strong style="color:var(--w1)">programming language</strong>. You type commands, and the computer follows them — like a very obedient robot. 🤖</p>
+  <p>Python is one of the easiest languages to start with. It reads almost like English.</p>
+  <div class="tip"><span class="ic">🌍</span><span>Python is used for websites, games, AI, automation... but none of that matters yet. Right now we're just learning to talk to it.</span></div>
+</div>
+<div class="stitle fi"><span class="snum">2</span> Your First Line of Code</div>
+<div class="card fi">
+  <p>The first thing everyone learns: <strong style="color:var(--w1)">print()</strong> — it shows text on screen.</p>
+  <div class="code-block">
+<span class="ln"><span class="cf">print</span>(<span class="cs">"Hello, World!"</span>)</span>
+<span class="ln"><span class="cf">print</span>(<span class="cs">"My name is Dara"</span>)</span>
+<span class="ln"><span class="cf">print</span>(<span class="cs">"I am learning Python!"</span>)</span>
+  </div>
+  <div class="gg"><div class="qlabel">🤔 What does <ic>print("Hi!")</ic> show on screen?</div>
+    <div class="gg-row"><input type="text" id="w1g1" placeholder="Your answer..." onkeydown="if(event.key==='Enter')cg('w1g1','Hi!','w1f1')"/>
+    <button class="btn" onclick="cg('w1g1','Hi!','w1f1')">Check 🎯</button></div>
+    <div class="fb" id="w1f1"></div></div>
+</div>
+<div class="stitle fi"><span class="snum">3</span> Comments — Notes for Humans</div>
+<div class="card fi">
+  <p>A <strong style="color:var(--w1)">comment</strong> starts with <ic>#</ic>. Python completely ignores it.</p>
+  <div class="code-block">
+<span class="ln"><span class="cc"># This is a comment. Python skips this.</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cs">"This actually runs"</span>)  <span class="cc"># can go at end too</span></span>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum">4</span> Syntax Errors</div>
+<div class="card fi">
+  <div class="code-block">
+<span class="ln"><span class="cf">print</span>(<span class="cs">"Hello"</span>)   <span class="cc"># ✅ correct</span></span>
+<span class="ln"><span class="cf">print</span> <span class="cs">"Hello"</span>   <span class="cc"># ❌ missing () — SyntaxError</span></span>
+  </div>
+  <div class="teacher-tip teacher-only"><span class="ic">💡</span><span>Tell him to break the code on purpose and read the error. Getting comfortable with errors early = huge confidence boost.</span></div>
+</div>
+<div class="quest fi" data-icon="🐍" style="--accent:var(--w1)">
+  <h2>🚀 Week 1 Quest: Introduce Yourself</h2>
+  <p>Write a program that introduces you using multiple print() lines and at least 2 comments.</p>
+  <ul class="req-list"><li>Print your name</li><li>Print your age</li><li>Print your favourite thing</li><li>Print one weird fun fact</li><li>Add at least 2 comments</li></ul>
+</div>
+</div><!-- end content1 -->
+</section>
+
+<!-- ══════════ WEEK 2 ══════════ -->
+<section class="week-section" id="w2" data-week="2">
+<div class="locked-screen" id="lock2" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content2">
+<div class="hero fi" style="background:linear-gradient(135deg,#091620,#0d2233);border:1px solid rgba(17,138,178,0.35);" data-emoji="📦">
+  <div class="hero-badge" style="border-color:var(--w2);color:var(--w2);">Week 2 · Beginner Python</div>
+  <h1 style="background:linear-gradient(135deg,#38bdf8,var(--w2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Variables & Data Types 📦</h1>
+  <p>Python needs to remember things. Variables are labelled boxes where you store information. This week Python gets a memory!</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w2);">🎯 Week Goals</h2>
+    <ul class="cklist">
+      <li onclick="toggleTask(this)"><span class="cb"></span>Create and use variables</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Know the 4 main data types</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Use type() to check types</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Use input() to get user data</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Print variables in sentences</li>
+    </ul>
+  </div>
+  <div class="teacher-card teacher-only fi">
+    <h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Draw a box on paper before touching code. Label the outside "name", write "Dara" inside. That's a variable. Make it physical first.</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>Ask: "If Python forgot everything each time, how would it remember your name?" Let him figure out why variables exist.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w2)">1</span> What is a Variable?</div>
+<div class="card fi">
+  <div class="code-block">
+<span class="ln"><span class="cv">name</span>  <span class="co">=</span> <span class="cs">"Dara"</span>    <span class="cc"># text</span></span>
+<span class="ln"><span class="cv">age</span>   <span class="co">=</span> <span class="cn">15</span>       <span class="cc"># whole number</span></span>
+<span class="ln"><span class="cv">score</span> <span class="co">=</span> <span class="cn">98.5</span>     <span class="cc"># decimal</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">name</span>)</span>
+  </div>
+  <div class="gg"><div class="qlabel">🤔 After <ic>x = 5</ic> then <ic>x = 10</ic>, what does <ic>print(x)</ic> show?</div>
+    <div class="gg-row"><input type="text" id="w2g1" placeholder="5 or 10?" onkeydown="if(event.key==='Enter')cg('w2g1','10','w2f1')"/>
+    <button class="btn" style="background:var(--w2);color:white;" onclick="cg('w2g1','10','w2f1')">Check 🎯</button></div>
+    <div class="fb" id="w2f1"></div></div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w2)">2</span> The 4 Main Data Types</div>
+<div class="card fi">
+  <div class="type-grid">
+    <div class="type-card" style="border-color:rgba(255,209,102,0.4);" onclick="revealType(this,'name = \"Dara\"')"><span class="te">📝</span><h4 style="color:var(--w1)">str</h4><p>Text / words</p><code>"Hello"</code></div>
+    <div class="type-card" style="border-color:rgba(168,85,247,0.4);" onclick="revealType(this,'age = 15')"><span class="te">🔢</span><h4 style="color:var(--w6)">int</h4><p>Whole numbers</p><code>15, -3, 100</code></div>
+    <div class="type-card" style="border-color:rgba(6,214,160,0.4);" onclick="revealType(this,'price = 4.99')"><span class="te">🔣</span><h4 style="color:var(--w4)">float</h4><p>Decimal numbers</p><code>4.99, 3.14</code></div>
+    <div class="type-card" style="border-color:rgba(239,71,111,0.4);" onclick="revealType(this,'is_cool = True')"><span class="te">✅</span><h4 style="color:var(--w3)">bool</h4><p>True or False</p><code>True / False</code></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w2)">3</span> Getting Input</div>
+<div class="card fi">
+  <div class="code-block">
+<span class="ln"><span class="cv">name</span> <span class="co">=</span> <span class="cf">input</span>(<span class="cs">"What is your name? "</span>)</span>
+<span class="ln"><span class="cf">print</span>(<span class="cs">"Hello, "</span> <span class="co">+</span> <span class="cv">name</span>)</span>
+  </div>
+  <div class="warn"><span class="ic">⚠️</span><span><ic>input()</ic> always gives back <strong>text (str)</strong> — even if the user types a number. We fix that in Week 3!</span></div>
+</div>
+<div class="quest fi" data-icon="📦" style="--accent:var(--w2)">
+  <h2>🚀 Week 2 Quest: Profile Card</h2>
+  <ul class="req-list"><li>Store name, age, favourite food, favourite game in variables</li><li>Use input() to ask for at least one of them</li><li>Print everything in a nice readable way</li><li>Use type() to check each variable's type</li></ul>
+</div>
+</div>
+</section>
+
+<!-- ══════════ WEEK 3 ══════════ -->
+<section class="week-section" id="w3" data-week="3">
+<div class="locked-screen" id="lock3" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content3">
+<div class="hero fi" style="background:linear-gradient(135deg,#1f0812,#2d0d1a);border:1px solid rgba(239,71,111,0.3);" data-emoji="➕">
+  <div class="hero-badge" style="border-color:var(--w3);color:var(--w3);">Week 3 · Beginner Python</div>
+  <h1 style="background:linear-gradient(135deg,var(--w1),var(--w3),var(--w6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Operators & Expressions ➕</h1>
+  <p>Python can do all your maths. This week we make it calculate things — and learn the habit of predicting output BEFORE running code.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w3);">🎯 Week Goals</h2>
+    <ul class="cklist">
+      <li onclick="toggleTask(this)"><span class="cb"></span>Use + − * / operators</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Know order of operations</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Combine text + numbers with str()</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Convert input with int()</li>
+      <li onclick="toggleTask(this)"><span class="cb"></span>Predict output before running</li>
+    </ul>
+  </div>
+  <div class="teacher-card teacher-only fi">
+    <h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Before EVERY code block, ask him to write the expected output on paper first. The prediction habit matters more than getting the right answer.</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>If he guesses wrong, don't correct immediately. Ask "Why did you think that?" Then run it and let the result teach him.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w3)">1</span> The 4 Math Operators</div>
+<div class="card fi">
+  <div class="op-grid">
+    <div class="op-card" style="color:var(--w1);border-color:rgba(255,209,102,0.3);" onclick="rv(this,'10 + 5 → 15')"><span class="op-symbol">+</span><h4>Add</h4><p>Same as always</p><div class="op-demo"></div></div>
+    <div class="op-card" style="color:var(--w3);border-color:rgba(239,71,111,0.3);" onclick="rv(this,'10 - 5 → 5')"><span class="op-symbol">−</span><h4>Subtract</h4><p>Find the diff</p><div class="op-demo"></div></div>
+    <div class="op-card" style="color:var(--w4);border-color:rgba(6,214,160,0.3);" onclick="rv(this,'10 * 5 → 50')"><span class="op-symbol">*</span><h4>Multiply</h4><p>Use * not ×</p><div class="op-demo"></div></div>
+    <div class="op-card" style="color:var(--w6);border-color:rgba(168,85,247,0.3);" onclick="rv(this,'10 / 5 → 2.0')"><span class="op-symbol">/</span><h4>Divide</h4><p>Use / not ÷</p><div class="op-demo"></div></div>
+  </div>
+  <div class="gg"><div class="qlabel">🤔 What does <ic>print(7 * 3)</ic> output?</div>
+    <div class="gg-row"><input type="text" id="w3g1" placeholder="?" onkeydown="if(event.key==='Enter')cg('w3g1','21','w3f1')"/>
+    <button class="btn" style="background:var(--w3);color:white;" onclick="cg('w3g1','21','w3f1')">Check 🎯</button></div>
+    <div class="fb" id="w3f1"></div></div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w3)">2</span> Order of Operations</div>
+<div class="card fi">
+  <div class="code-block">
+<span class="ln"><span class="cv">result</span> <span class="co">=</span> <span class="cn">10</span> <span class="co">+</span> <span class="cn">5</span> <span class="co">*</span> <span class="cn">2</span>   <span class="cc"># 20, NOT 30!</span></span>
+<span class="ln"><span class="cv">fixed</span>  <span class="co">=</span> (<span class="cn">10</span> <span class="co">+</span> <span class="cn">5</span>) <span class="co">*</span> <span class="cn">2</span>  <span class="cc"># brackets → 30</span></span>
+  </div>
+  <div class="gg"><div class="qlabel">🧠 <ic>5 + 3 * 2</ic> = ?</div>
+    <div class="gg-row"><input type="text" id="w3g2" placeholder="?" onkeydown="if(event.key==='Enter')cg('w3g2','11','w3f2')"/>
+    <button class="btn" style="background:var(--w3);color:white;" onclick="cg('w3g2','11','w3f2')">Check 🎯</button></div>
+    <div class="fb" id="w3f2"></div></div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w3)">3</span> Text + Numbers + input()</div>
+<div class="card fi">
+  <div class="code-block">
+<span class="ln"><span class="cv">age</span> <span class="co">=</span> <span class="cn">15</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cs">"I am "</span> <span class="co">+</span> <span class="cf">str</span>(<span class="cv">age</span>))   <span class="cc"># ✅ works</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cs">"I am "</span> <span class="co">+</span> <span class="cv">age</span>)        <span class="cc"># ❌ crash!</span></span>
+<span class="ln"><span class="cv">num</span> <span class="co">=</span> <span class="cf">int</span>(<span class="cf">input</span>(<span class="cs">"Enter a number: "</span>))</span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">num</span> <span class="co">+</span> <span class="cn">10</span>)</span>
+  </div>
+  <div class="gg"><div class="qlabel">🤔 User types "7". What does <ic>int(input()) + 10</ic> print?</div>
+    <div class="gg-row"><input type="text" id="w3g3" placeholder="?" onkeydown="if(event.key==='Enter')cg('w3g3','17','w3f3')"/>
+    <button class="btn" style="background:var(--w3);color:white;" onclick="cg('w3g3','17','w3f3')">Check 🎯</button></div>
+    <div class="fb" id="w3f3"></div></div>
+</div>
+<div class="quest fi" data-icon="🧮" style="--accent:var(--w3)">
+  <h2>🚀 Week 3 Quest: Simple Calculator</h2>
+  <ul class="req-list"><li>Ask for first number, then second number</li><li>Convert both with int()</li><li>Print: Addition, Subtraction, Multiplication, Division</li></ul>
+</div>
+</div>
+</section>
+
+<!-- ══════════ WEEKS 4-12 SHELLS ══════════ -->
+<!-- Each week has a locked-screen + content div. Content loaded via JS for brevity. -->
+
+<section class="week-section" id="w4" data-week="4">
+<div class="locked-screen" id="lock4" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content4"></div></section>
+
+<section class="week-section" id="w5" data-week="5">
+<div class="locked-screen" id="lock5" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content5"></div></section>
+
+<section class="week-section" id="w6" data-week="6">
+<div class="locked-screen" id="lock6" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content6"></div></section>
+
+<section class="week-section" id="w7" data-week="7">
+<div class="locked-screen" id="lock7" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content7"></div></section>
+
+<section class="week-section" id="w8" data-week="8">
+<div class="locked-screen" id="lock8" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content8"></div></section>
+
+<section class="week-section" id="w9" data-week="9">
+<div class="locked-screen" id="lock9" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content9"></div></section>
+
+<section class="week-section" id="w10" data-week="10">
+<div class="locked-screen" id="lock10" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content10"></div></section>
+
+<section class="week-section" id="w11" data-week="11">
+<div class="locked-screen" id="lock11" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content11"></div></section>
+
+<section class="week-section" id="w12" data-week="12">
+<div class="locked-screen" id="lock12" style="display:none"><div class="lock-icon">🔒</div><h2>Lesson Locked</h2><p>Your teacher hasn't unlocked this lesson yet. Come back when it's ready!</p></div>
+<div id="content12"></div></section>
+
+</main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const TEACHER_PASSWORD = 'teach123';
+
+const weeks=[
+  {id:'w1', label:'Hello, Python!',     emoji:'🐍', color:'--w1',  group:'Basics'},
+  {id:'w2', label:'Variables & Types',  emoji:'📦', color:'--w2',  group:'Basics'},
+  {id:'w3', label:'Operators',          emoji:'➕', color:'--w3',  group:'Basics'},
+  {id:'w4', label:'if/else — Part 1',   emoji:'🤔', color:'--w4',  group:'Decisions'},
+  {id:'w5', label:'if/else — Part 2',   emoji:'🔀', color:'--w5',  group:'Decisions'},
+  {id:'w6', label:'while Loop',         emoji:'🔁', color:'--w6',  group:'Loops'},
+  {id:'w7', label:'for Loop',           emoji:'🔄', color:'--w7',  group:'Loops'},
+  {id:'w8', label:'Nested Loops',       emoji:'🌀', color:'--w8',  group:'Loops'},
+  {id:'w9', label:'Functions — Part 1', emoji:'🧩', color:'--w9',  group:'Functions'},
+  {id:'w10',label:'Functions — Part 2', emoji:'⚙️', color:'--w10', group:'Functions'},
+  {id:'w11',label:'Lists — Part 1',     emoji:'📋', color:'--w11', group:'Lists'},
+  {id:'w12',label:'Lists — Part 2 🏆',  emoji:'🏆', color:'--w12', group:'Lists'},
+];
+
+/* lock state: 1=unlocked, 0=locked. Week 1 unlocked by default. */
+const lockState = [1,0,0,0,0,0,0,0,0,0,0,0];
+
+let score=0, currentWeek=1, isTeacher=false;
+let loopAnim=null;
+
+/* ═══════════════════════════════════════════
+   MODE SWITCHING
+═══════════════════════════════════════════ */
+function setToggleUI(mode){
+  const isT = mode==='teacher';
+  // sidebar buttons
+  document.getElementById('btnStudent').classList.toggle('active', !isT);
+  document.getElementById('btnTeacher').classList.toggle('active', isT);
+  // mobile pill buttons
+  const ms=document.getElementById('mobBtnStudent');
+  const mt=document.getElementById('mobBtnTeacher');
+  if(ms){ ms.classList.toggle('active',!isT); }
+  if(mt){ mt.classList.toggle('active', isT); }
+  // update mobile bar background tint
+  const bar=document.getElementById('mobileBar');
+  if(bar) bar.style.borderBottomColor = isT ? 'rgba(255,209,102,0.35)' : 'var(--border)';
+}
+
+function clickStudentMode(){
+  if(!isTeacher) return;
+  isTeacher=false;
+  document.body.classList.add('student-mode');
+  setToggleUI('student');
+  document.getElementById('scoreBar').style.display='flex';
+  buildNav();
+  applyLockUI();
+}
+
+function clickTeacherMode(){
+  if(isTeacher) return;
+  openPwModal();
+}
+
+function enterTeacherMode(){
+  isTeacher=true;
+  document.body.classList.remove('student-mode');
+  setToggleUI('teacher');
+  document.getElementById('scoreBar').style.display='none';
+  buildNav();
+  applyLockUI();
+}
+
+/* ═══════════════════════════════════════════
+   PASSWORD MODAL
+═══════════════════════════════════════════ */
+function openPwModal(){
+  document.getElementById('pwModal').classList.add('open');
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwError').textContent='';
+  document.getElementById('pwInput').classList.remove('pw-wrong');
+  setTimeout(()=>document.getElementById('pwInput').focus(),200);
+}
+
+function closePwModal(){
+  document.getElementById('pwModal').classList.remove('open');
+}
+
+function submitPw(){
+  const val=document.getElementById('pwInput').value;
+  const errEl=document.getElementById('pwError');
+  const inp=document.getElementById('pwInput');
+  if(val===TEACHER_PASSWORD){
+    closePwModal();
+    enterTeacherMode();
+  } else {
+    errEl.textContent='❌ Wrong password. Try again!';
+    inp.classList.add('pw-wrong');
+    inp.style.animation='none';
+    inp.offsetHeight;
+    inp.style.animation='shake 0.4s ease';
+    setTimeout(()=>{inp.classList.remove('pw-wrong');inp.value='';},700);
+  }
+}
+
+/* close modal on overlay click */
+document.getElementById('pwModal').addEventListener('click',function(e){
+  if(e.target===this)closePwModal();
+});
+
+/* ═══════════════════════════════════════════
+   LOCK SYSTEM
+═══════════════════════════════════════════ */
+function toggleLock(weekIndex, e){
+  e.stopPropagation();
+  lockState[weekIndex] = lockState[weekIndex]===1 ? 0 : 1;
+  buildNav();
+  applyLockUI();
+  // if current week just got locked and we're in student mode, go to first unlocked
+  if(!isTeacher && lockState[currentWeek-1]===0){
+    const first=lockState.findIndex(s=>s===1);
+    if(first>=0) goWeek(first+1);
+  }
+}
+
+function applyLockUI(){
+  for(let i=0;i<12;i++){
+    const lockEl=document.getElementById('lock'+(i+1));
+    const contentEl=document.getElementById('content'+(i+1));
+    if(!lockEl||!contentEl) continue;
+    if(isTeacher){
+      // teacher sees everything
+      lockEl.style.display='none';
+      contentEl.style.display='';
+    } else {
+      if(lockState[i]===1){
+        lockEl.style.display='none';
+        contentEl.style.display='';
+      } else {
+        lockEl.style.display='flex';
+        contentEl.style.display='none';
+      }
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   NAV BUILD
+═══════════════════════════════════════════ */
+function buildNav(){
+  const nav=document.getElementById('weekNav');
+  const mob=document.getElementById('mobDrawerInner');
+  const wp=document.getElementById('wprogress');
+  nav.innerHTML=''; mob.innerHTML=''; wp.innerHTML='';
+
+  let lastGroup='';
+  weeks.forEach((w,i)=>{
+    const c=`var(${w.color})`;
+    const active=i+1===currentWeek;
+    const unlocked=lockState[i]===1;
+
+    if(w.group!==lastGroup){
+      lastGroup=w.group;
+      const gl=document.createElement('div');
+      gl.className='week-group-label';
+      gl.textContent=w.group;
+      nav.appendChild(gl);
+    }
+
+    // nav item
+    const item=document.createElement('div');
+    const lockedClass=(!isTeacher&&!unlocked)?'locked-nav':'';
+    item.className=`week-nav-item ${active?'active':''} ${lockedClass}`;
+    item.style.setProperty('--accent',c);
+
+    const dotEl=`<span class="week-dot" style="background:${c};color:#0f0e17">${i+1}</span>`;
+    const labelEl=`${w.emoji} ${w.label}`;
+    let extra='';
+
+    if(isTeacher){
+      // unlock toggle button
+      const btnClass=unlocked?'open-btn':'locked-btn';
+      const btnLabel=unlocked?'🔓':'🔒';
+      extra=`<button class="unlock-btn ${btnClass}" onclick="toggleLock(${i},event)" title="${unlocked?'Lock':'Unlock'} this week">${btnLabel}</button>`;
+    } else if(!unlocked){
+      extra=`<span class="nav-lock">🔒</span>`;
+    }
+
+    item.innerHTML=`${dotEl}${labelEl}${extra}`;
+    if(isTeacher||unlocked){
+      item.onclick=()=>{goWeek(i+1);closeDrawer();};
+    }
+    nav.appendChild(item);
+
+    // mobile clone (simplified)
+    const mi=document.createElement('div');
+    mi.className=`week-nav-item ${active?'active':''} ${lockedClass}`;
+    mi.style.setProperty('--accent',c);
+    mi.innerHTML=`${dotEl}${labelEl}${!isTeacher&&!unlocked?'<span class="nav-lock">🔒</span>':''}`;
+    if(isTeacher||unlocked) mi.onclick=()=>{goWeek(i+1);closeDrawer();};
+    mob.appendChild(mi);
+
+    // progress dot
+    const dot=document.createElement('div');
+    dot.className=`wp-dot ${unlocked?'unlocked':''} ${active?'current':''}`;
+    dot.style.background=active?`var(${w.color})`:unlocked?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.1)';
+    dot.title='Week '+(i+1)+': '+w.label;
+    if(isTeacher||unlocked) dot.onclick=()=>goWeek(i+1);
+    wp.appendChild(dot);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+function goWeek(n){
+  // students can't navigate to locked weeks
+  if(!isTeacher && lockState[n-1]===0) return;
+  currentWeek=n;
+  document.querySelectorAll('.week-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('w'+n).classList.add('active');
+  document.documentElement.style.setProperty('--accent',`var(${weeks[n-1].color})`);
+  document.getElementById('curWeekLabel').textContent='Week '+n+' – '+weeks[n-1].label;
+  buildNav();
+  applyLockUI();
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(triggerFI,80);
+}
+
+/* ═══════════════════════════════════════════
+   FADE IN
+═══════════════════════════════════════════ */
+function triggerFI(){
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}});
+  },{threshold:0.07});
+  document.querySelectorAll('.week-section.active .fi').forEach(el=>{
+    if(!el.classList.contains('vis')) io.observe(el);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE
+═══════════════════════════════════════════ */
+function openDrawer(){document.getElementById('mobDrawer').classList.add('open');}
+function closeDrawer(){document.getElementById('mobDrawer').classList.remove('open');}
+
+/* ═══════════════════════════════════════════
+   SCORE + CONFETTI
+═══════════════════════════════════════════ */
+function addScore(pts){
+  score+=pts;
+  document.getElementById('scoreVal').textContent=score;
+  const em=['⭐','🎉','✨','🔥','💥','🎯'];
+  const el=document.createElement('div');
+  el.className='conf';
+  el.textContent=em[Math.floor(Math.random()*em.length)];
+  el.style.cssText=`left:${15+Math.random()*60}%;bottom:80px;`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
+/* ═══════════════════════════════════════════
+   INTERACTIONS
+═══════════════════════════════════════════ */
+function cg(inputId,answer,fbId){
+  const inp=document.getElementById(inputId);
+  const fb=document.getElementById(fbId);
+  if(!inp||!fb)return;
+  const val=(inp.value||'').trim();
+  if(!val)return;
+  inp.classList.remove('ok','no');
+  if(val===answer){
+    inp.classList.add('ok');fb.className='fb ok';
+    fb.textContent='🎉 Exactly right! +10 points!';
+    addScore(10);inp.disabled=true;
+  } else {
+    inp.classList.add('no');fb.className='fb no';
+    fb.textContent=`❌ Not quite — the answer is "${answer}". Think it through!`;
+    inp.style.animation='none';inp.offsetHeight;inp.style.animation='shake 0.4s ease';
+  }
+}
+function rv(card,text){card.classList.toggle('revealed');card.querySelector('.op-demo').textContent=text;addScore(2);}
+function revealType(card,ex){card.querySelector('code').textContent=ex;card.style.transform='scale(1.06)';setTimeout(()=>card.style.transform='',300);addScore(2);}
+function toggleTask(li){
+  const done=li.classList.toggle('done');
+  li.querySelector('.cb').textContent=done?'✓':'';
+  if(done)addScore(5);else{score=Math.max(0,score-5);document.getElementById('scoreVal').textContent=score;}
+}
+function animateLoop(){
+  if(loopAnim)return;
+  const ids=['lb1','lb2','lb3','lb4','lb5'];
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.className='loop-box';});
+  let i=0;
+  loopAnim=setInterval(()=>{
+    if(i>0){const p=document.getElementById(ids[i-1]);if(p)p.className='loop-box done';}
+    if(i<ids.length){const c=document.getElementById(ids[i]);if(c)c.className='loop-box active';i++;}
+    else{clearInterval(loopAnim);loopAnim=null;}
+  },500);
+}
+
+/* ═══════════════════════════════════════════
+   WEEK 4–12 CONTENT INJECTION
+═══════════════════════════════════════════ */
+const weekContent={
+  4:`<div class="hero fi" style="background:linear-gradient(135deg,#061a13,#0a2a1e);border:1px solid rgba(6,214,160,0.3);" data-emoji="🤔">
+  <div class="hero-badge" style="border-color:var(--w4);color:var(--w4);">Week 4 · if / else — Part 1 of 2</div>
+  <div class="part-tag" style="color:var(--w4);">Part 1: The Basics</div>
+  <h1 style="background:linear-gradient(135deg,var(--w4),#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">if / else — Python Thinks! 🤔</h1>
+  <p>Now Python can make decisions. "If this is true, do this. Otherwise, do that." One of the biggest ideas in programming.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w4);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand True/False conditions</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Know all 6 comparison operators</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Write a basic if statement</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Add an else branch</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand indentation matters</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Use real-life examples first out loud: "If it's raining, I take an umbrella." Let him invent his own if/else situations before touching code.</p>
+    <div class="teacher-tip"><span class="ic">⚠️</span><span>Indentation is everything. Python uses 4 spaces to know what's inside the if block. Get him used to this from the very first example.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w4);color:var(--bg)">1</span> Comparison Operators</div>
+<div class="card fi"><table class="cmp-table">
+  <tr><th>Symbol</th><th>Meaning</th><th>Example</th><th>Result</th></tr>
+  <tr><td>==</td><td>Equal to</td><td>5 == 5</td><td class="t">True</td></tr>
+  <tr><td>!=</td><td>Not equal</td><td>5 != 3</td><td class="t">True</td></tr>
+  <tr><td>&gt;</td><td>Greater than</td><td>10 &gt; 5</td><td class="t">True</td></tr>
+  <tr><td>&lt;</td><td>Less than</td><td>3 &lt; 10</td><td class="t">True</td></tr>
+  <tr><td>&gt;=</td><td>Greater or equal</td><td>5 &gt;= 5</td><td class="t">True</td></tr>
+  <tr><td>&lt;=</td><td>Less or equal</td><td>4 &lt;= 3</td><td class="f">False</td></tr>
+</table>
+<div class="gg"><div class="qlabel">🤔 Is <ic>10 == 10</ic> True or False?</div>
+  <div class="gg-row"><input type="text" id="w4g1" placeholder="True or False?" onkeydown="if(event.key==='Enter')cg('w4g1','True','w4f1')"/>
+  <button class="btn" style="background:var(--w4);color:var(--bg);" onclick="cg('w4g1','True','w4f1')">Check 🎯</button></div>
+  <div class="fb" id="w4f1"></div></div></div>
+<div class="stitle fi"><span class="snum" style="background:var(--w4);color:var(--bg)">2</span> if + else</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cv">age</span> <span class="co">=</span> <span class="cn">15</span></span>
+<span class="ln"><span class="cf">if</span> <span class="cv">age</span> <span class="co">>=</span> <span class="cn">18</span>:</span>
+<span class="ln">    <span class="cf">print</span>(<span class="cs">"You can vote!"</span>)</span>
+<span class="ln"><span class="cf">else</span>:</span>
+<span class="ln">    <span class="cf">print</span>(<span class="cs">"Too young to vote"</span>)</span>
+</div>
+<div class="gg"><div class="qlabel">🧠 With <ic>age = 15</ic>, which message prints?</div>
+  <div class="gg-row"><input type="text" id="w4g2" placeholder="Type the message..." onkeydown="if(event.key==='Enter')cg('w4g2','Too young to vote','w4f2')"/>
+  <button class="btn" style="background:var(--w4);color:var(--bg);" onclick="cg('w4g2','Too young to vote','w4f2')">Check 🎯</button></div>
+  <div class="fb" id="w4f2"></div></div>
+<div class="tip"><span class="ic">💡</span><span>Only ONE branch runs — either if OR else. Never both.</span></div></div>
+<div class="quest fi" data-icon="🚦" style="--accent:var(--w4)"><h2>🚀 Week 4 Quest: Pass or Fail</h2>
+<p>Ask for a test score and tell the student if they passed or failed.</p>
+<ul class="req-list"><li>Ask for their score (convert with int())</li><li>If score >= 50: print "You passed! 🎉"</li><li>else: print "You failed. Try again 💪"</li><li>Bonus: also print "Top score! 🔥" if score is 100</li></ul>
+<div class="teacher-tip teacher-only" style="margin-top:12px;"><span class="ic">🧑‍🏫</span><span>Don't move to Week 5 until he can write a complete if/else block from scratch without looking at examples.</span></div>
+</div>`,
+
+  5:`<div class="hero fi" style="background:linear-gradient(135deg,#071a14,#0c2a20);border:1px solid rgba(45,212,191,0.3);" data-emoji="🔀">
+  <div class="hero-badge" style="border-color:var(--w5);color:var(--w5);">Week 5 · if / else — Part 2 of 2</div>
+  <div class="part-tag" style="color:var(--w5);">Part 2: elif, and / or / not</div>
+  <h1 style="background:linear-gradient(135deg,var(--w5),var(--w4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">elif, and / or / not 🔀</h1>
+  <p>One condition isn't always enough. This week we add more branches and combine conditions to handle real-world logic.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w5);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Add multiple branches with elif</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use and to check two things at once</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use or for either-or conditions</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use not to flip True/False</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Write nested if statements</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Before code: play "20 Questions". "Am I thinking of something alive AND bigger than a dog?" Make and/or feel natural through conversation first.</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>Key insight for elif: Python checks top to bottom and STOPS at the first True. Draw this as a flowchart on paper.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w5)">1</span> elif — More Branches</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cv">score</span> <span class="co">=</span> <span class="cn">75</span></span>
+<span class="ln"><span class="cf">if</span> <span class="cv">score</span> <span class="co">>=</span> <span class="cn">90</span>: <span class="cf">print</span>(<span class="cs">"A 🔥"</span>)</span>
+<span class="ln"><span class="cf">elif</span> <span class="cv">score</span> <span class="co">>=</span> <span class="cn">70</span>: <span class="cf">print</span>(<span class="cs">"B 👍"</span>)</span>
+<span class="ln"><span class="cf">elif</span> <span class="cv">score</span> <span class="co">>=</span> <span class="cn">50</span>: <span class="cf">print</span>(<span class="cs">"C 💪"</span>)</span>
+<span class="ln"><span class="cf">else</span>: <span class="cf">print</span>(<span class="cs">"Below 50 📚"</span>)</span>
+</div>
+<div class="gg"><div class="qlabel">🧠 With <ic>score = 75</ic>, which prints?</div>
+  <div class="gg-row"><input type="text" id="w5g1" placeholder="?" onkeydown="if(event.key==='Enter')cg('w5g1','B 👍','w5f1')"/>
+  <button class="btn" style="background:var(--w5);" onclick="cg('w5g1','B 👍','w5f1')">Check 🎯</button></div>
+  <div class="fb" id="w5f1"></div></div></div>
+<div class="stitle fi"><span class="snum" style="background:var(--w5)">2</span> and / or / not</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cv">age</span> <span class="co">=</span> <span class="cn">20</span>  ,  <span class="cv">has_ticket</span> <span class="co">=</span> <span class="cn">True</span></span>
+<span class="ln"><span class="cf">if</span> <span class="cv">age</span> <span class="co">>=</span> <span class="cn">18</span> <span class="co">and</span> <span class="cv">has_ticket</span>: <span class="cf">print</span>(<span class="cs">"You can enter!"</span>)</span>
+<span class="ln"><span class="cf">if</span> <span class="co">not</span> <span class="cv">has_ticket</span>: <span class="cf">print</span>(<span class="cs">"No ticket!"</span>)</span>
+</div></div>
+<div class="quest fi" data-icon="🎮" style="--accent:var(--w5)"><h2>🚀 Week 5 Quest: Age Category Checker</h2>
+<ul class="req-list"><li>Under 13 → "Kid"</li><li>13–17 → "Teenager"</li><li>18–64 → "Adult"</li><li>65+ → "Senior — respect! 🫡"</li></ul></div>`,
+
+  6:`<div class="hero fi" style="background:linear-gradient(135deg,#150a2a,#1e0d3d);border:1px solid rgba(168,85,247,0.3);" data-emoji="🔁">
+  <div class="hero-badge" style="border-color:var(--w6);color:var(--w6);">Week 6 · Loops — Part 1 of 3</div>
+  <div class="part-tag" style="color:var(--w6);">Part 1: while loop</div>
+  <h1 style="background:linear-gradient(135deg,var(--w6),var(--w7));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">while Loop — Keep Going! 🔁</h1>
+  <p>Loops let you repeat code without copy-pasting. The while loop keeps going until a condition becomes False.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w6);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand what a loop is</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Write a while loop with a counter</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Update the counter inside the loop</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use break to escape early</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Recognize and fix an infinite loop</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Draw the loop as a circle on paper first. Show execution goes around until the condition stops it.</p>
+    <div class="teacher-tip"><span class="ic">⚠️</span><span>Intentionally show an infinite loop (forgetting to increment). Let him see it spin and manually stop it — he'll remember forever.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w6)">1</span> The while Loop</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cv">count</span> <span class="co">=</span> <span class="cn">1</span></span>
+<span class="ln"><span class="cf">while</span> <span class="cv">count</span> <span class="co"><=</span> <span class="cn">5</span>:</span>
+<span class="ln">    <span class="cf">print</span>(<span class="cs">"Count:"</span>, <span class="cv">count</span>)</span>
+<span class="ln">    <span class="cv">count</span> <span class="co">=</span> <span class="cv">count</span> <span class="co">+</span> <span class="cn">1</span>   <span class="cc"># CRUCIAL!</span></span>
+</div>
+<div id="loopVisual" class="loop-visual">
+  <div class="loop-box" id="lb1">1</div><div class="loop-arrow">→</div>
+  <div class="loop-box" id="lb2">2</div><div class="loop-arrow">→</div>
+  <div class="loop-box" id="lb3">3</div><div class="loop-arrow">→</div>
+  <div class="loop-box" id="lb4">4</div><div class="loop-arrow">→</div>
+  <div class="loop-box" id="lb5">5</div><div class="loop-arrow">→</div>
+  <div class="loop-box" style="background:rgba(239,71,111,0.12);border-color:var(--w3);color:var(--w3);font-size:11px;">stop</div>
+  <button class="btn" style="background:var(--w6);color:white;margin-left:6px;" onclick="animateLoop()">▶ Play</button>
+</div>
+<div class="gg"><div class="qlabel">🤔 How many lines does this print?</div>
+  <div class="gg-row"><input type="text" id="w6g1" placeholder="?" onkeydown="if(event.key==='Enter')cg('w6g1','5','w6f1')"/>
+  <button class="btn" style="background:var(--w6);color:white;" onclick="cg('w6g1','5','w6f1')">Check 🎯</button></div>
+  <div class="fb" id="w6f1"></div></div></div>
+<div class="stitle fi"><span class="snum" style="background:var(--w6)">2</span> break — Emergency Stop</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cf">while</span> <span class="cn">True</span>:</span>
+<span class="ln">    <span class="cv">guess</span> <span class="co">=</span> <span class="cf">int</span>(<span class="cf">input</span>(<span class="cs">"Guess: "</span>))</span>
+<span class="ln">    <span class="cf">if</span> <span class="cv">guess</span> <span class="co">==</span> <span class="cn">7</span>: <span class="cf">break</span>   <span class="cc"># got it!</span></span>
+<span class="ln">    <span class="cf">print</span>(<span class="cs">"Wrong!"</span>)</span>
+</div></div>
+<div class="quest fi" data-icon="🎮" style="--accent:var(--w6)"><h2>🚀 Week 6 Quest: Number Guessing Game</h2>
+<ul class="req-list"><li>Set secret = 7</li><li>Use while True: to keep asking</li><li>Too low / Too high / You got it! 🎉 then break</li></ul></div>`,
+
+  7:`<div class="hero fi" style="background:linear-gradient(135deg,#1a0d2e,#260e3d);border:1px solid rgba(192,132,252,0.3);" data-emoji="🔄">
+  <div class="hero-badge" style="border-color:var(--w7);color:var(--w7);">Week 7 · Loops — Part 2 of 3</div>
+  <div class="part-tag" style="color:var(--w7);">Part 2: for loop + range()</div>
+  <h1 style="background:linear-gradient(135deg,var(--w7),var(--w8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">for Loop — Count Like a Pro 🔄</h1>
+  <p>The for loop is cleaner when you know exactly how many times to repeat. It's the most common loop you'll write.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w7);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Write a for loop with range()</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand range(start, stop, step)</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Loop through a string</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use continue to skip a round</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Know when to use for vs while</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>range(5) starting at 0 confuses people. Be explicit: "Python counts from 0 — range(5) gives 0,1,2,3,4."</p>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w7)">1</span> for + range()</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cf">for</span> <span class="cv">i</span> <span class="cf">in</span> <span class="cf">range</span>(<span class="cn">5</span>): <span class="cf">print</span>(<span class="cs">"Round"</span>, <span class="cv">i</span>)  <span class="cc"># 0,1,2,3,4</span></span>
+<span class="ln"><span class="cf">for</span> <span class="cv">i</span> <span class="cf">in</span> <span class="cf">range</span>(<span class="cn">1</span>,<span class="cn">6</span>): <span class="cf">print</span>(<span class="cv">i</span>)           <span class="cc"># 1,2,3,4,5</span></span>
+<span class="ln"><span class="cf">for</span> <span class="cv">i</span> <span class="cf">in</span> <span class="cf">range</span>(<span class="cn">10</span>,<span class="cn">0</span>,-<span class="cn">1</span>): <span class="cf">print</span>(<span class="cv">i</span>)       <span class="cc"># countdown!</span></span>
+</div>
+<div class="gg"><div class="qlabel">🤔 <ic>range(3)</ic> gives which numbers?</div>
+  <div class="gg-row"><input type="text" id="w7g1" placeholder="e.g. 0, 1, 2" onkeydown="if(event.key==='Enter')cg('w7g1','0, 1, 2','w7f1')"/>
+  <button class="btn" style="background:var(--w7);color:white;" onclick="cg('w7g1','0, 1, 2','w7f1')">Check 🎯</button></div>
+  <div class="fb" id="w7f1"></div></div></div>
+<div class="quest fi" data-icon="🔢" style="--accent:var(--w7)"><h2>🚀 Week 7 Quest: Times Table Printer</h2>
+<ul class="req-list"><li>Ask which times table (convert to int)</li><li>Loop from 1 to 12 using range(1,13)</li><li>Print: "3 x 1 = 3", "3 x 2 = 6" etc.</li></ul></div>`,
+
+  8:`<div class="hero fi" style="background:linear-gradient(135deg,#1f0a28,#2d0e38);border:1px solid rgba(232,121,249,0.3);" data-emoji="🌀">
+  <div class="hero-badge" style="border-color:var(--w8);color:var(--w8);">Week 8 · Loops — Part 3 of 3</div>
+  <div class="part-tag" style="color:var(--w8);">Part 3: Nested Loops & Patterns</div>
+  <h1 style="background:linear-gradient(135deg,var(--w8),var(--w6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Nested Loops & Patterns 🌀</h1>
+  <p>A loop inside a loop. How you build grids, patterns, and tables. Once this clicks, loops feel genuinely powerful.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w8);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand nested loop execution order</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Trace nested loop output on paper</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Print a rectangle of stars</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Print a triangle pattern</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Build a multiplication table</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Draw as rows and columns — outer loop = rows, inner loop = columns. Trace manually on paper before any code.</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>Pattern printing is the most satisfying way to learn nested loops. Let him experiment freely — change symbols, change sizes.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w8)">1</span> Nested Loops</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cf">for</span> <span class="cv">row</span> <span class="cf">in</span> <span class="cf">range</span>(<span class="cn">3</span>):</span>
+<span class="ln">    <span class="cf">for</span> <span class="cv">col</span> <span class="cf">in</span> <span class="cf">range</span>(<span class="cn">4</span>):</span>
+<span class="ln">        <span class="cf">print</span>(<span class="cs">"*"</span>, end=<span class="cs">""</span>)</span>
+<span class="ln">    <span class="cf">print</span>()  <span class="cc"># new line each row → 3 rows of ****</span></span>
+</div>
+<div class="gg"><div class="qlabel">🧠 How many total * symbols?</div>
+  <div class="gg-row"><input type="text" id="w8g1" placeholder="?" onkeydown="if(event.key==='Enter')cg('w8g1','12','w8f1')"/>
+  <button class="btn" style="background:var(--w8);color:white;" onclick="cg('w8g1','12','w8f1')">Check 🎯</button></div>
+  <div class="fb" id="w8f1"></div></div></div>
+<div class="stitle fi"><span class="snum" style="background:var(--w8)">2</span> Triangle + String Multiplication</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cf">for</span> <span class="cv">i</span> <span class="cf">in</span> <span class="cf">range</span>(<span class="cn">1</span>,<span class="cn">6</span>):</span>
+<span class="ln">    <span class="cf">print</span>(<span class="cs">"*"</span> <span class="co">*</span> <span class="cv">i</span>)  <span class="cc"># *, **, ***, ****,  *****</span></span>
+</div>
+<div class="tip"><span class="ic">💡</span><span><ic>"*" * 3</ic> gives <ic>"***"</ic>. Multiplying a string repeats it!</span></div></div>
+<div class="quest fi" data-icon="🌀" style="--accent:var(--w8)"><h2>🚀 Week 8 Quest: Pattern Playground</h2>
+<ul class="req-list"><li>Solid rectangle (ask user for width and height)</li><li>Right-triangle growing from 1 to 5 rows</li><li>Full 10×10 multiplication table</li></ul></div>`,
+
+  9:`<div class="hero fi" style="background:linear-gradient(135deg,#1a0f00,#2a1800);border:1px solid rgba(247,127,0,0.3);" data-emoji="🧩">
+  <div class="hero-badge" style="border-color:var(--w9);color:var(--w9);">Week 9 · Functions — Part 1 of 2</div>
+  <div class="part-tag" style="color:var(--w9);">Part 1: def and Calling</div>
+  <h1 style="background:linear-gradient(135deg,var(--w9),var(--w1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Functions — Write Once, Use Forever 🧩</h1>
+  <p>Why write the same code 10 times when you can write it once and reuse it? Functions are Python's way of saving your work.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w9);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand what a function is</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Define a function with def</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Call a function to run it</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Call the same function multiple times</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Know that defining ≠ running</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Vending machine analogy: built once (def), press the button any time (calling it). The biggest concept: defining does NOTHING by itself.</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>Prove it: write a def block, run the code, show nothing happens. Then add the call. That moment of understanding is huge.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w9)">1</span> Define + Call</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cf">def</span> <span class="cv">say_hello</span>():</span>
+<span class="ln">    <span class="cf">print</span>(<span class="cs">"Hey! 👋"</span>)</span>
+<span class="ln"> </span>
+<span class="ln"><span class="cc"># Nothing printed yet — defining does nothing</span></span>
+<span class="ln"><span class="cv">say_hello</span>()   <span class="cc"># NOW it runs</span></span>
+<span class="ln"><span class="cv">say_hello</span>()   <span class="cc"># runs again!</span></span>
+<span class="ln"><span class="cv">say_hello</span>()   <span class="cc"># and again!</span></span>
+</div>
+<div class="gg"><div class="qlabel">🤔 How many times does "Hey! 👋" print?</div>
+  <div class="gg-row"><input type="text" id="w9g1" placeholder="?" onkeydown="if(event.key==='Enter')cg('w9g1','3','w9f1')"/>
+  <button class="btn" style="background:var(--w9);" onclick="cg('w9g1','3','w9f1')">Check 🎯</button></div>
+  <div class="fb" id="w9f1"></div></div></div>
+<div class="quest fi" data-icon="🧩" style="--accent:var(--w9)"><h2>🚀 Week 9 Quest: Greeting Machine</h2>
+<ul class="req-list"><li>def print_header() → prints a decorated title</li><li>def print_divider() → prints "─────────────────"</li><li>def greet_user() → asks for name then says hello</li><li>Call all three in order to make a nice welcome screen</li></ul></div>`,
+
+  10:`<div class="hero fi" style="background:linear-gradient(135deg,#1a1000,#2a1900);border:1px solid rgba(251,146,60,0.3);" data-emoji="⚙️">
+  <div class="hero-badge" style="border-color:var(--w10);color:var(--w10);">Week 10 · Functions — Part 2 of 2</div>
+  <div class="part-tag" style="color:var(--w10);">Part 2: Parameters & return</div>
+  <h1 style="background:linear-gradient(135deg,var(--w10),var(--w9));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Parameters & return ⚙️</h1>
+  <p>Functions that only print are limited. This week they learn to take inputs and send results back — making them truly powerful tools.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w10);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Pass values in using parameters</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use multiple parameters</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use return to send a result back</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Store the returned value</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand local variable scope</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Parameters = coins into vending machine. Return = snack comes out to your hand — you decide what to do with it next.</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>Scope: keep it simple — "variables made inside a function only exist inside that function." Don't go deep into global/nonlocal yet.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w10)">1</span> Parameters</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cf">def</span> <span class="cv">greet</span>(<span class="cv">name</span>):</span>
+<span class="ln">    <span class="cf">print</span>(<span class="cs">"Hey "</span> <span class="co">+</span> <span class="cv">name</span> <span class="co">+</span> <span class="cs">"! 👋"</span>)</span>
+<span class="ln"><span class="cv">greet</span>(<span class="cs">"Dara"</span>)    <span class="cc"># Hey Dara! 👋</span></span>
+<span class="ln"><span class="cv">greet</span>(<span class="cs">"Amara"</span>)   <span class="cc"># Hey Amara! 👋</span></span>
+</div></div>
+<div class="stitle fi"><span class="snum" style="background:var(--w10)">2</span> return</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cf">def</span> <span class="cv">multiply</span>(<span class="cv">a</span>, <span class="cv">b</span>): <span class="cf">return</span> <span class="cv">a</span> <span class="co">*</span> <span class="cv">b</span></span>
+<span class="ln"><span class="cv">result</span> <span class="co">=</span> <span class="cv">multiply</span>(<span class="cn">4</span>, <span class="cn">5</span>)   <span class="cc"># result = 20</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">multiply</span>(<span class="cn">6</span>, <span class="cn">7</span>))       <span class="cc"># 42</span></span>
+</div>
+<div class="gg"><div class="qlabel">🧠 What does <ic>multiply(6, 7)</ic> return?</div>
+  <div class="gg-row"><input type="text" id="w10g1" placeholder="?" onkeydown="if(event.key==='Enter')cg('w10g1','42','w10f1')"/>
+  <button class="btn" style="background:var(--w10);" onclick="cg('w10g1','42','w10f1')">Check 🎯</button></div>
+  <div class="fb" id="w10f1"></div></div></div>
+<div class="quest fi" data-icon="⚙️" style="--accent:var(--w10)"><h2>🚀 Week 10 Quest: Function Calculator v2</h2>
+<ul class="req-list"><li>def add(a,b), subtract(a,b), multiply(a,b), divide(a,b) — all return values</li><li>def show_results(n1,n2) calls all four and prints results</li><li>Handle divide by zero!</li></ul></div>`,
+
+  11:`<div class="hero fi" style="background:linear-gradient(135deg,#1a081a,#2a0d25);border:1px solid rgba(236,72,153,0.3);" data-emoji="📋">
+  <div class="hero-badge" style="border-color:var(--w11);color:var(--w11);">Week 11 · Lists — Part 1 of 2</div>
+  <div class="part-tag" style="color:var(--w11);">Part 1: The Basics</div>
+  <h1 style="background:linear-gradient(135deg,var(--w11),var(--w6));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lists — Storing Many Things 📋</h1>
+  <p>Variables hold one thing. Lists hold as many things as you want. Like a shopping list — in code.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w11);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Create a list with [ ]</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Access items by index (starts at 0!)</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Update items</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Add and remove items</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Loop through a list</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Write a shopping list on paper first. Then show Python stores the same thing. Draw numbered boxes: box 0, box 1, box 2.</p>
+    <div class="teacher-tip"><span class="ic">⚠️</span><span>Index 0 is the most common mistake. Ask him to point to "the second item" — watch him say index 2. That's the teachable moment.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w11)">1</span> Creating & Accessing</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cv">fruits</span> <span class="co">=</span> [<span class="cs">"apple"</span>, <span class="cs">"banana"</span>, <span class="cs">"mango"</span>]</span>
+<span class="ln">          <span class="cc">#   [0]       [1]       [2]</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">fruits</span>[<span class="cn">0</span>])   <span class="cc"># apple</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">fruits</span>[-<span class="cn">1</span>])  <span class="cc"># mango (last item)</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cf">len</span>(<span class="cv">fruits</span>))  <span class="cc"># 3</span></span>
+</div>
+<div class="gg"><div class="qlabel">🤔 <ic>scores = [85, 90, 72]</ic>. What is <ic>scores[1]</ic>?</div>
+  <div class="gg-row"><input type="text" id="w11g1" placeholder="?" onkeydown="if(event.key==='Enter')cg('w11g1','90','w11f1')"/>
+  <button class="btn" style="background:var(--w11);color:white;" onclick="cg('w11g1','90','w11f1')">Check 🎯</button></div>
+  <div class="fb" id="w11f1"></div></div></div>
+<div class="stitle fi"><span class="snum" style="background:var(--w11)">2</span> Modifying, Adding, Removing, Looping</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cv">fruits</span>[<span class="cn">0</span>] <span class="co">=</span> <span class="cs">"grape"</span>       <span class="cc"># update</span></span>
+<span class="ln"><span class="cv">fruits</span>.<span class="cf">append</span>(<span class="cs">"mango"</span>)    <span class="cc"># add to end</span></span>
+<span class="ln"><span class="cv">fruits</span>.<span class="cf">remove</span>(<span class="cs">"banana"</span>)  <span class="cc"># remove by value</span></span>
+<span class="ln"><span class="cf">for</span> <span class="cv">fruit</span> <span class="cf">in</span> <span class="cv">fruits</span>: <span class="cf">print</span>(<span class="cs">"I like"</span>, <span class="cv">fruit</span>)</span>
+</div></div>
+<div class="quest fi" data-icon="🛒" style="--accent:var(--w11)"><h2>🚀 Week 11 Quest: Shopping List App</h2>
+<ul class="req-list"><li>Start with shop = []</li><li>While loop: ask "Add item (or 'done' to finish):"</li><li>Append each item</li><li>When done: print list and total count</li></ul></div>`,
+
+  12:`<div class="hero fi" style="background:linear-gradient(135deg,#0a1628,#142040);border:1px solid rgba(56,189,248,0.3);" data-emoji="🏆">
+  <div class="hero-badge" style="border-color:var(--w12);color:var(--w12);">Week 12 · Lists — Part 2 · FINAL WEEK</div>
+  <div class="part-tag" style="color:var(--w12);">Part 2: Methods + Bridge to Objects</div>
+  <h1 style="background:linear-gradient(90deg,var(--w1),var(--w3),var(--w4),var(--w6),var(--w11),var(--w12));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Lists Advanced + Objects Preview 🏆</h1>
+  <p>The final week. More list power tools, and then a peek at what comes after this course: objects.</p>
+</div>
+<div class="g2 fi">
+  <div class="card"><h2 style="color:var(--w12);">🎯 Goals</h2><ul class="cklist">
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use sort, reverse, count, index</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Slice a list to get a portion</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Use lists inside functions</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>Understand what an object is (concept)</li>
+    <li onclick="toggleTask(this)"><span class="cb"></span>See that a list is already an object</li>
+  </ul></div>
+  <div class="teacher-card teacher-only fi"><h2>🧑‍🏫 Teacher Notes</h2>
+    <p>Two goals: round out list knowledge, plant the OOP seed. Don't teach full classes — just: "A list is already an object — it has data AND methods built in."</p>
+    <div class="teacher-tip"><span class="ic">💡</span><span>Let him come up with his own object ideas: "What data and actions would a Game object have?" That thinking IS the OOP foundation.</span></div>
+  </div>
+</div>
+<div class="stitle fi"><span class="snum" style="background:var(--w12)">1</span> List Methods + Slicing</div>
+<div class="card fi"><div class="code-block">
+<span class="ln"><span class="cv">nums</span> <span class="co">=</span> [<span class="cn">5</span>,<span class="cn">1</span>,<span class="cn">9</span>,<span class="cn">3</span>,<span class="cn">7</span>]</span>
+<span class="ln"><span class="cv">nums</span>.<span class="cf">sort</span>()         <span class="cc"># [1,3,5,7,9]</span></span>
+<span class="ln"><span class="cv">nums</span>.<span class="cf">reverse</span>()      <span class="cc"># [9,7,5,3,1]</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">nums</span>.<span class="cf">count</span>(<span class="cn">5</span>))  <span class="cc"># how many 5s</span></span>
+<span class="ln"> </span>
+<span class="ln"><span class="cv">letters</span> <span class="co">=</span> [<span class="cs">"a"</span>,<span class="cs">"b"</span>,<span class="cs">"c"</span>,<span class="cs">"d"</span>,<span class="cs">"e"</span>]</span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">letters</span>[<span class="cn">1</span>:<span class="cn">4</span>])   <span class="cc"># ['b','c','d']</span></span>
+<span class="ln"><span class="cf">print</span>(<span class="cv">letters</span>[:<span class="cn">3</span>])     <span class="cc"># ['a','b','c']</span></span>
+</div></div>
+<div class="stitle fi"><span class="snum" style="background:var(--w12)">2</span> 🧠 You've Already Been Using Objects</div>
+<div class="obj-preview fi">
+  <h3>🔮 Lists ARE Objects</h3>
+  <p>An <strong style="color:#38bdf8">object</strong> is something that has both <strong style="color:#38bdf8">data</strong> (what it stores) and <strong style="color:#38bdf8">methods</strong> (things it can do). A list is already one!</p>
+  <div class="code-block" style="border-color:rgba(56,189,248,0.2);">
+<span class="ln"><span class="cv">my_list</span> <span class="co">=</span> [<span class="cn">3</span>,<span class="cn">1</span>,<span class="cn">2</span>]    <span class="cc"># DATA</span></span>
+<span class="ln"><span class="cv">my_list</span>.<span class="cf">sort</span>()          <span class="cc"># METHOD — action the list knows</span></span>
+<span class="ln"><span class="cv">my_list</span>.<span class="cf">append</span>(<span class="cn">4</span>)      <span class="cc"># METHOD</span></span>
+</div>
+  <p>That <ic>.</ic> means "do this action ON this object." You've been doing OOP this whole time without knowing it!</p>
+</div>
+<div class="obj-preview fi">
+  <h3>🐕 What Objects Look Like Later</h3>
+  <div class="code-block" style="border-color:rgba(56,189,248,0.15);">
+<span class="ln"><span class="cf">class</span> <span class="cv">Dog</span>:</span>
+<span class="ln">    <span class="cf">def</span> <span class="cv">__init__</span>(<span class="cv">self</span>, <span class="cv">name</span>):</span>
+<span class="ln">        <span class="cv">self</span>.<span class="cv">name</span> <span class="co">=</span> <span class="cv">name</span>   <span class="cc"># DATA</span></span>
+<span class="ln">    <span class="cf">def</span> <span class="cv">bark</span>(<span class="cv">self</span>):          <span class="cc"># METHOD</span></span>
+<span class="ln">        <span class="cf">print</span>(<span class="cv">self</span>.<span class="cv">name</span>, <span class="cs">"says: Woof! 🐕"</span>)</span>
+<span class="ln"> </span>
+<span class="ln"><span class="cv">my_dog</span> <span class="co">=</span> <span class="cv">Dog</span>(<span class="cs">"Max"</span>)   <span class="cc"># create the object</span></span>
+<span class="ln"><span class="cv">my_dog</span>.<span class="cf">bark</span>()           <span class="cc"># use it → Max says: Woof! 🐕</span></span>
+</div>
+  <p>Same pattern as a list: data + methods. This is what comes after this course!</p>
+  <div class="teacher-tip teacher-only"><span class="ic">🧑‍🏫</span><span>Don't teach class syntax now. Just show it, point out the pattern, ask: "What other objects could we invent?" — Cat? Car? Game? Player?</span></div>
+</div>
+<div class="quest fi" data-icon="🏆" style="--accent:var(--w12)"><h2>🚀 FINAL BOSS: Quiz Game</h2>
+<p>Use EVERYTHING from 12 weeks to build a full quiz game. Final boss. 🔥</p>
+<ul class="req-list">
+  <li>Store 5 questions and 5 answers in lists</li>
+  <li>for loop + range(len()) to go through each question</li>
+  <li>input() for the user's answer each time</li>
+  <li>if/else to check answer and update a score variable</li>
+  <li>def get_grade(score) returns the letter grade</li>
+  <li>Print final score + grade at the end</li>
+</ul>
+<div class="teacher-tip teacher-only" style="margin-top:12px;"><span class="ic">🧑‍🏫</span><span>Once done: ask him to explain every single line without looking at examples. If he can — course complete. 🏆</span></div>
+</div>
+<div class="card fi" style="text-align:center;padding:36px;border-color:rgba(255,209,102,0.2);margin-top:16px;">
+  <div style="font-size:52px;margin-bottom:12px;">🎉🐍🏆</div>
+  <h2 style="font-family:'Fredoka One',cursive;font-size:24px;background:linear-gradient(135deg,var(--w1),var(--w3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;">12 Weeks. Done. You Actually Did It.</h2>
+  <p style="color:var(--muted);max-width:460px;margin:0 auto 16px;line-height:1.7;font-size:13px;">No rushing. No career pressure. Just Python, for fun. You now know: variables, operators, if/else, loops, functions, and lists. That's real programming.</p>
+  <div style="font-size:13px;color:var(--muted);">What's next → <span style="color:var(--w12)">Turtle graphics 🐢</span> · <span style="color:var(--w11)">Text games</span> · <span style="color:var(--w9)">Classes & OOP</span> · <span style="color:var(--w6)">Pygame</span></div>
+</div>`
+};
+
+/* inject week 4–12 content */
+for(let i=4;i<=12;i++){
+  const el=document.getElementById('content'+i);
+  if(el) el.innerHTML=weekContent[i];
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+// start in student mode, week 1 unlocked
+goWeek(1);
+applyLockUI();
+</script>
+</body>
+</html>
